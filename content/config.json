@@ -1,0 +1,10 @@
+{
+  "title": "9Hells",
+  "startLayer": 9,
+  "startGold": 10,
+  "levels": [0, 60, 150, 280, 450, 650],
+  "downAt": 0,
+  "deadAt": -10,
+  "maxPendingAttacksPerMonster": 3,
+  "catchUpPerDead": 0.1
+}

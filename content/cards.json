@@ -1,0 +1,323 @@
+[
+  {
+    "id": "lemure",
+    "notes": "PLACEHOLDER. Minion: any hit kills it.",
+    "kind": "monster",
+    "name": "Lemure",
+    "tags": ["minion", "devil"],
+    "weight": 2,
+    "text": "A lemure drags itself toward {actor}, a mound of melted souls.",
+    "tracked": { "hp": 1, "ac": 7, "attack": 2, "damage": "1d4" },
+    "spawns": {
+      "counter": { "template": "lemure_attack", "place": { "shuffleTop": 2 } },
+      "self": { "place": { "below": "counter" } }
+    },
+    "afterPlay": [
+      { "if": "self.hp <= 0", "do": "discard", "effects": [{ "op": "addExp", "value": 8 }] },
+      { "else": true, "do": "discard", "spawn": ["counter", "self"] }
+    ]
+  },
+  {
+    "id": "lemure_attack",
+    "notes": "PLACEHOLDER. Uses the actor's defence actions.",
+    "kind": "monsterAttack",
+    "text": "The lemure lurches at {actor}, claws dripping."
+  },
+  {
+    "id": "imp",
+    "notes": "PLACEHOLDER. Stun (shield bash, ray of frost) sends it deeper into the deck.",
+    "kind": "monster",
+    "name": "Imp",
+    "tags": ["devil"],
+    "weight": 2,
+    "text": "An imp circles {actor}, giggling. ({self.hp} HP)",
+    "tracked": { "hp": 5, "ac": 13, "attack": 4, "damage": "1d4+1" },
+    "spawns": {
+      "counter": { "template": "imp_attack", "place": { "shuffleTop": 3 } },
+      "self": { "place": { "below": "counter" } },
+      "stunned": { "place": { "shuffleTop": [3, 5] } }
+    },
+    "afterPlay": [
+      { "if": "self.hp <= 0", "do": "discard", "effects": [{ "op": "addExp", "value": 15 }, { "op": "addGold", "value": 2 }] },
+      {
+        "if": "self.stunned",
+        "do": "discard",
+        "effects": [
+          { "op": "setStat", "target": "self", "stat": "stunned", "value": "false" },
+          { "op": "text", "value": "The imp tumbles away, dazed." }
+        ],
+        "spawn": ["stunned"]
+      },
+      { "else": true, "do": "discard", "spawn": ["counter", "self"] }
+    ]
+  },
+  {
+    "id": "imp_attack",
+    "notes": "PLACEHOLDER",
+    "kind": "monsterAttack",
+    "text": "The imp dives stinger-first at {actor}."
+  },
+  {
+    "id": "hell_hound",
+    "notes": "PLACEHOLDER. Two counterattacks per round.",
+    "kind": "monster",
+    "name": "Hell hound",
+    "tags": ["fiend"],
+    "text": "A hell hound blocks the path, smoke curling from its jaws. ({self.hp} HP)",
+    "tracked": { "hp": 15, "ac": 13, "attack": 4, "damage": "1d8" },
+    "spawns": {
+      "counter": { "template": "hound_attack", "count": 2, "place": { "shuffleTop": 3 } },
+      "self": { "place": { "below": "counter" } },
+      "stunned": { "place": { "below": "counter", "within": [2, 4] } }
+    },
+    "afterPlay": [
+      { "if": "self.hp <= 0", "do": "discard", "effects": [{ "op": "addExp", "value": 40 }, { "op": "addGold", "value": 5 }] },
+      {
+        "if": "self.stunned",
+        "do": "discard",
+        "effects": [{ "op": "setStat", "target": "self", "stat": "stunned", "value": "false" }],
+        "spawn": ["counter", "stunned"]
+      },
+      { "else": true, "do": "discard", "spawn": ["counter", "self"] }
+    ]
+  },
+  {
+    "id": "hound_attack",
+    "notes": "PLACEHOLDER. Left uses the actor's own defence. Right sends the Fighter in instead, falling back to the actor.",
+    "kind": "monsterAttack",
+    "text": "The hell hound lunges for {actor}'s throat.",
+    "right": {
+      "label": "The Fighter steps in",
+      "effects": [{ "op": "monsterStrike", "target": "role:fighter", "fallback": "actor" }]
+    }
+  },
+  {
+    "id": "lemure_tide",
+    "notes": "PLACEHOLDER. Group spawn demo.",
+    "text": "The ground of Nessus heaves. Lemures rise all around you.",
+    "spawns": {
+      "horde": { "template": "lemure", "count": 3, "place": { "shuffleTop": 4 } },
+      "stragglers": { "template": "lemure", "count": 2, "place": { "shuffleTop": 3 } }
+    },
+    "left": { "label": "Hold the line", "effects": [{ "op": "spawn", "value": "horde" }] },
+    "right": {
+      "label": "Run for the ridge",
+      "effects": [{
+        "roll": { "mod": "dex", "vs": 13, "who": "actor", "label": "Run" },
+        "success": [{ "op": "text", "value": "{actor} leads everyone clear." }, { "op": "addExp", "value": 5 }],
+        "fail": [{ "op": "text", "value": "Too slow. Some of them catch up." }, { "op": "spawn", "value": "stragglers" }]
+      }]
+    }
+  },
+  {
+    "id": "imp_notary",
+    "notes": "PLACEHOLDER. Signing adds deck 2 (the notary's ledger) and sets a soul owner.",
+    "speaker": "Imp notary",
+    "text": "\"Ah, the climbers. Nessus is so hard to leave without the proper paperwork. One signature, one soul, and I'll patch you all up. Standard terms.\"",
+    "left": {
+      "label": "Tear up the contract",
+      "effects": [{
+        "roll": { "mod": "str", "vs": 12, "who": "random_alive", "label": "Tear it up" },
+        "success": [{ "op": "addExp", "value": 20 }, { "op": "addGold", "value": 5 }],
+        "fail": [{ "op": "text", "value": "The parchment bites back." }, { "op": "damage", "target": "roller", "value": 4 }]
+      }]
+    },
+    "right": {
+      "label": "Sign",
+      "effects": [
+        { "op": "setSoulOwner", "target": "random_alive", "value": "imp_notary" },
+        { "op": "heal", "target": "party_not_dead", "value": 6 },
+        { "op": "addDeck", "value": "notarys_ledger" }
+      ]
+    }
+  },
+  {
+    "id": "blood_river",
+    "notes": "PLACEHOLDER",
+    "text": "A river of blood cuts across the path, warm and slow.",
+    "left": {
+      "label": "Wade across",
+      "effects": [{
+        "roll": { "mod": "dex", "vs": 11, "who": "random_alive", "label": "Wade" },
+        "success": [{ "op": "text", "value": "Everyone makes it across, sticky but whole." }],
+        "fail": [{ "op": "text", "value": "Something under the surface takes a bite." }, { "op": "damage", "target": "roller", "value": 3 }]
+      }]
+    },
+    "right": {
+      "label": "Drink",
+      "effects": [{ "op": "heal", "target": "party_alive", "value": 3 }, { "op": "setFlag", "value": "drank_blood" }]
+    }
+  },
+  {
+    "id": "soul_coins",
+    "notes": "PLACEHOLDER",
+    "text": "Soul coins glint in the ash. Someone is still screaming inside them.",
+    "left": { "label": "Leave them", "effects": [{ "op": "addExp", "value": 5 }] },
+    "right": { "label": "Take them", "effects": [{ "op": "addGold", "value": 15 }, { "op": "setFlag", "value": "greedy" }] }
+  },
+  {
+    "id": "devil_merchant",
+    "notes": "PLACEHOLDER. Conditional effect demo.",
+    "speaker": "A rakshasa merchant",
+    "text": "\"Healing draughts. Ten gold. No refunds, no questions.\"",
+    "left": { "label": "Move on", "effects": [] },
+    "right": {
+      "label": "Buy (10 gold)",
+      "effects": [{
+        "if": "gold >= 10",
+        "then": [{ "op": "addGold", "value": -10 }, { "op": "heal", "target": "party_not_dead", "value": 5 }],
+        "else": [{ "op": "text", "value": "You can't afford it. He smiles anyway." }]
+      }]
+    },
+    "afterPlay": "reshuffle"
+  },
+  {
+    "id": "shrine",
+    "notes": "PLACEHOLDER. Hidden roll demo.",
+    "text": "A shrine to Asmodeus. The candles burn black.",
+    "left": {
+      "label": "Desecrate it",
+      "effects": [{
+        "roll": { "mod": "wis", "vs": 13, "who": "actor", "visible": false },
+        "success": [{ "op": "text", "value": "The candles gutter out. Nothing follows. Yet." }, { "op": "addExp", "value": 30 }],
+        "fail": [{ "op": "text", "value": "Black fire licks along the party's shadows." }, { "op": "damage", "target": "party", "value": 2 }]
+      }]
+    },
+    "right": { "label": "Kneel", "effects": [{ "op": "addExp", "value": 10 }, { "op": "setFlag", "value": "knelt" }] }
+  },
+  {
+    "id": "pit_fiend_glance",
+    "notes": "PLACEHOLDER. Same outcome either way (flavour).",
+    "text": "Far off, a pit fiend glances your way, then loses interest. Even its glance burns.",
+    "left": { "label": "Look away", "effects": [{ "op": "damage", "target": "random_alive", "value": "1d4" }] },
+    "right": { "label": "Meet its gaze", "effects": [{ "op": "damage", "target": "random_alive", "value": "1d4" }] }
+  },
+  {
+    "id": "hunted",
+    "notes": "PLACEHOLDER. Hunter demo: the hound is shuffled deep and comes back later.",
+    "text": "Something is following you through the ash.",
+    "spawns": {
+      "stalker": { "template": "hell_hound", "place": { "shuffleTop": [8, 15] } },
+      "ambushed": { "template": "hell_hound", "place": "top" }
+    },
+    "left": { "label": "Keep moving", "effects": [{ "op": "spawn", "value": "stalker" }] },
+    "right": {
+      "label": "Set an ambush",
+      "effects": [{
+        "roll": { "mod": "dex", "vs": 14, "who": "actor", "label": "Ambush" },
+        "success": [{ "op": "text", "value": "It walks straight into it, and gives up the hunt." }, { "op": "addExp", "value": 20 }],
+        "fail": [{ "op": "text", "value": "It was waiting for you." }, { "op": "spawn", "value": "ambushed" }]
+      }]
+    }
+  },
+  {
+    "id": "campfire",
+    "notes": "PLACEHOLDER",
+    "text": "A sheltered hollow, warm with brimstone.",
+    "left": { "label": "Rest", "effects": [{ "op": "heal", "target": "party_not_dead", "value": 4 }] },
+    "right": { "label": "Press on", "effects": [{ "op": "addExp", "value": 10 }] }
+  },
+  {
+    "id": "downed_rescue",
+    "notes": "PLACEHOLDER. Only appears while someone is down.",
+    "conditions": ["party.down > 0"],
+    "text": "{actor} kneels beside a fallen friend.",
+    "left": { "label": "Bind their wounds", "effects": [{ "op": "heal", "target": "random_down", "value": 5 }] },
+    "right": { "label": "Keep watch", "effects": [] },
+    "afterPlay": "reshuffle"
+  },
+  {
+    "id": "stair_up",
+    "notes": "PLACEHOLDER. Exit card. 'Not yet' puts it back a few cards down.",
+    "conditions": ["turn >= 15"],
+    "text": "A stair of fused bone climbs into the dark. Cania waits at the top.",
+    "spawns": { "later": { "place": { "shuffleTop": [4, 8] } } },
+    "left": { "label": "Climb", "effects": [{ "op": "endLayer" }] },
+    "right": { "label": "Not yet", "effects": [{ "op": "spawn", "value": "later" }] }
+  },
+  {
+    "id": "notary_collector",
+    "notes": "PLACEHOLDER. Deck 2.",
+    "speaker": "Imp notary",
+    "text": "\"{actor}! A small matter of interest on the contract.\"",
+    "left": {
+      "label": "Pay (8 gold)",
+      "effects": [{
+        "if": "gold >= 8",
+        "then": [{ "op": "addGold", "value": -8 }],
+        "else": [{ "op": "text", "value": "\"Short? We'll take it in blood.\"" }, { "op": "damage", "target": "actor", "value": 3 }]
+      }]
+    },
+    "right": { "label": "Refuse", "effects": [{ "op": "damage", "target": "random_alive", "value": 2 }, { "op": "setFlag", "value": "notary_angry" }] },
+    "afterPlay": "reshuffle"
+  },
+  {
+    "id": "notary_favour",
+    "notes": "PLACEHOLDER. Deck 2.",
+    "speaker": "Imp notary",
+    "text": "\"A gift for valued clients: a shard of someone else's soul.\"",
+    "left": { "label": "Refuse", "effects": [] },
+    "right": { "label": "Accept", "effects": [{ "op": "heal", "target": "party_alive", "value": 3 }, { "op": "addExp", "value": 10 }] }
+  },
+  {
+    "id": "barbed_devil",
+    "notes": "PLACEHOLDER. Deck 3.",
+    "kind": "monster",
+    "name": "Barbed devil",
+    "tags": ["devil"],
+    "text": "A barbed devil unfolds from the rocks in front of {actor}. ({self.hp} HP)",
+    "tracked": { "hp": 22, "ac": 15, "attack": 5, "damage": "1d10" },
+    "spawns": {
+      "counter": { "template": "barbed_attack", "count": 2, "place": { "shuffleTop": 3 } },
+      "self": { "place": { "below": "counter" } },
+      "stunned": { "place": { "below": "counter", "within": [2, 4] } }
+    },
+    "afterPlay": [
+      { "if": "self.hp <= 0", "do": "discard", "effects": [{ "op": "addExp", "value": 60 }, { "op": "addGold", "value": 10 }] },
+      {
+        "if": "self.stunned",
+        "do": "discard",
+        "effects": [{ "op": "setStat", "target": "self", "stat": "stunned", "value": "false" }],
+        "spawn": ["counter", "stunned"]
+      },
+      { "else": true, "do": "discard", "spawn": ["counter", "self"] }
+    ]
+  },
+  {
+    "id": "barbed_attack",
+    "notes": "PLACEHOLDER. Deck 3.",
+    "kind": "monsterAttack",
+    "text": "Barbs whip toward {actor}."
+  },
+  {
+    "id": "veteran_cache",
+    "notes": "PLACEHOLDER. Deck 3.",
+    "text": "You know what to look for now. There's a cache beneath a dead tiefling.",
+    "left": {
+      "label": "Search it",
+      "effects": [{
+        "roll": { "mod": "wis", "vs": 12, "who": "actor", "label": "Search" },
+        "success": [{ "op": "addGold", "value": 20 }],
+        "fail": [{ "op": "text", "value": "Trapped." }, { "op": "damage", "target": "roller", "value": 2 }]
+      }]
+    },
+    "right": { "label": "Leave it", "effects": [] }
+  },
+  {
+    "id": "levelup_choice",
+    "notes": "PLACEHOLDER. Spawned on top by the levelup_card rule, bound to the character who levelled.",
+    "kind": "levelUp",
+    "text": "{bound} reaches level {bound.level}. Choose a boon.",
+    "left": {
+      "label": "Toughen (+3 max HP)",
+      "effects": [{ "op": "modifyStat", "target": "bound", "stat": "maxHp", "value": 3 }, { "op": "heal", "target": "bound", "value": 3 }]
+    },
+    "right": {
+      "label": "Train (+1 to hit)",
+      "effects": [
+        { "op": "addActionMod", "target": "bound", "value": { "id": "train-L-{bound.level}", "action": "attackLeft", "toHit": 1 } },
+        { "op": "addActionMod", "target": "bound", "value": { "id": "train-R-{bound.level}", "action": "attackRight", "toHit": 1 } }
+      ]
+    }
+  }
+]

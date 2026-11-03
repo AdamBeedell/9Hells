@@ -1,0 +1,21 @@
+[
+  {
+    "id": "main",
+    "name": "Nessus (main)",
+    "startActive": true,
+    "cards": [
+      "lemure", "imp", "hell_hound", "lemure_tide", "imp_notary", "blood_river", "soul_coins",
+      "devil_merchant", "shrine", "pit_fiend_glance", "hunted", "campfire", "downed_rescue", "stair_up"
+    ]
+  },
+  {
+    "id": "notarys_ledger",
+    "name": "The Notary's Ledger (deck 2, added by signing the contract)",
+    "cards": ["notary_collector", "notary_favour"]
+  },
+  {
+    "id": "veterans",
+    "name": "Veterans (deck 3, added on first level up)",
+    "cards": ["barbed_devil", "veteran_cache"]
+  }
+]
