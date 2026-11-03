@@ -1,0 +1,44 @@
+{
+  "name": "9hells",
+  "version": "0.1.0",
+  "description": "Reigns-style card game set in the Nine Hells",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n server,client \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "tsx watch src/server/index.ts",
+    "dev:client": "vite",
+    "build": "vite build && tsc -p tsconfig.json",
+    "start": "node --disable-warning=ExperimentalWarning dist/server/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc -p tsconfig.client.json",
+    "test": "vitest run",
+    "check-content": "tsx scripts/check-content.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdamBeedell/9hells.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdamBeedell/9hells/issues"
+  },
+  "homepage": "https://github.com/AdamBeedell/9hells#readme",
+  "dependencies": {
+    "@fastify/cookie": "^11.1.5",
+    "@fastify/static": "^10.1.8",
+    "fastify": "^5.12.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "concurrently": "^10.0.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "imp_notary",
+    "name": "Imp notary",
+    "onDeath": [
+      { "op": "text", "value": "The notary's quill scratches. {bound} will be... reissued." },
+      { "op": "resurrectIn", "target": "bound", "turns": 3, "hp": 4 }
+    ]
+  },
+  {
+    "id": "glasya_contract",
+    "name": "Glasya's contract",
+    "onDeath": [
+      { "op": "text", "value": "{bound}'s contract transfers to a new holder." },
+      { "op": "replaceWith", "target": "bound", "value": "bound_imp" }
+    ]
+  }
+]

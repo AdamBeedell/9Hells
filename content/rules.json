@@ -1,0 +1,17 @@
+[
+  {
+    "id": "veterans_on_first_levelup",
+    "trigger": "levelUp",
+    "once": true,
+    "actions": [
+      { "op": "addDeck", "value": "veterans", "place": "shuffle" },
+      { "op": "text", "value": "The Hells take notice. Tougher things begin to hunt you." }
+    ]
+  },
+  {
+    "id": "levelup_card",
+    "trigger": "levelUp",
+    "spawns": { "card": { "template": "levelup_choice", "place": "top", "bind": "bound" } },
+    "actions": [{ "op": "spawn", "value": "card" }]
+  }
+]
