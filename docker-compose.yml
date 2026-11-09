@@ -6,8 +6,8 @@ services:
     ports:
       - "9377:3000"          # host:container. Point cloudflared at http://<zimaos-host>:9377
     environment:
-      ADMIN_USER: admin
-      ADMIN_PASSWORD: change-me   # set this before first start
+      ADMIN_USER: ${ADMINUSERNAME}
+      ADMIN_PASSWORD: ${ADMINPASS}  # set this before first start
       ALLOW_REGISTRATION: "true"  # set to "false" once your players have accounts
       COOKIE_SECURE: "false"      # "true" only if you will ONLY ever use the HTTPS (cloudflared) address; LAN http logins need "false"
     volumes:
